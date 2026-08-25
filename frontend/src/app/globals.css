@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 白背景固定のライトテーマ。OS のダークモード設定で色反転しないよう明示（A8-2）。 */
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #ffffff;
+  color: #111827; /* gray-900: 本文コントラスト 4.5:1 以上を確保 */
+}
+
+/* PC 専用。最小幅を定め、幅を縮めてもレイアウトが破綻しないようにする（A8-1）。 */
+body {
+  min-width: 1024px;
+}
+
+/* スクリーンリーダー専用テキスト（視覚的に隠す）。 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

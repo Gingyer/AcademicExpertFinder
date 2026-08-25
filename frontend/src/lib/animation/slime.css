@@ -1,0 +1,75 @@
+/*
+ * slime アニメーションのスコープ付きスタイル。
+ * 移植元 frontend-test-output/slime_default/styles.css の #scene/#stage/#hud/.anim-obj/.tri を
+ * クラスベース(.slime-*)に置き換えたもの。白背景テーマに合わせ、暗色の舞台背景は使わない。
+ */
+
+/* スライムの表示枠。scale で拡大しても transform はレイアウト高さを増やさないため、
+   ズーム倍率に応じた高さをここで確保し、上下で切れないようにする。
+   ズームを変えたいときは --slime-zoom の値だけ変える（scale とフレーム高さが連動する）。
+   高さ = スライムの見かけ高さ(座標系で約170px) × ズーム。 */
+.slime-frame {
+  --slime-zoom: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 拡大で広がる左右の透明余白がページ外へはみ出さないよう抑える。 */
+  height: calc(170px * var(--slime-zoom));
+}
+
+/* 舞台。白地に埋もれないよう極薄いグレー面＋淡い影で領域を分ける（A8-2）。 */
+.slime-scene {
+  position: relative;
+  overflow: hidden;
+  /* 白背景ページに溶け込ませる（枠・影・角丸なし）。 */
+  background: transparent;
+  /* stage の実サイズは JS で設定。表示だけ拡大する（座標系・アニメは不変）。
+     倍率は親 .slime-frame の --slime-zoom を継承（フレーム高さと連動）。 */
+  transform: scale(var(--slime-zoom, 3));
+  transform-origin: center center;
+  max-width: 100%;
+}
+
+.slime-stage,
+.slime-hud {
+  position: absolute;
+  inset: 0;
+}
+.slime-hud {
+  pointer-events: none;
+}
+
+/* 各オブジェクト。描画は transform/opacity のみ（再レイアウトを起こさない）。 */
+.slime-obj {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+}
+.slime-obj > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* メッシュ変形（三角形分割）。 */
+.slime-mesh {
+  position: absolute;
+  inset: 0;
+}
+.slime-tri {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+}
+.slime-tri img {
+  display: block;
+}
+
+/* will-change は再生中のみ付与し、静止時の合成コストを避ける（NFR）。 */
+.slime-scene.is-playing .slime-obj,
+.slime-scene.is-playing .slime-tri {
+  will-change: transform, opacity;
+}

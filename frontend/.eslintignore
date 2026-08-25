@@ -1,0 +1,4 @@
+# 旧フロントエンドの凍結アーカイブは Lint 対象外（参照・復元用の凍結スナップショット）。
+# ※ ../legacy/frontend は frontend/ の外にあるため next lint の対象外だが、防御的に明示。
+../legacy/
+.next/

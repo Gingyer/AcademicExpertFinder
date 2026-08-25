@@ -1,0 +1,93 @@
+# import-linter 契約（Modular Monolith + Hexagonal の依存規律を機械強制）
+#
+# 実行: DATABASE_URL=sqlite:// lint-imports
+#
+# 構成:
+#   app/modules/{search,history,ai,document}/  … 機能 Module（各 Module 内に ports/adapters）
+#   app/shared/                                … 横断的な契約(models/progress/similarity)
+#   app/{container,main,config,database}.py    … Composition Root / platform
+
+[importlinter]
+root_package = app
+include_external_packages = True
+
+# ─────────────────────────────────────────────────────────────
+# Hexagonal: Port 層は具体技術を知らない
+# ─────────────────────────────────────────────────────────────
+[importlinter:contract:ports-pure]
+name = 各 Module の Ports は具体技術(Chroma/SQLAlchemy/FastAPI/Gemini)に依存しない
+type = forbidden
+source_modules =
+    app.modules.ai.ports
+    app.modules.search.ports
+    app.modules.history.ports
+forbidden_modules =
+    chromadb
+    sqlalchemy
+    fastapi
+    google
+    app.modules.ai.adapters
+    app.modules.document.vector_store
+    app.modules.history.repository
+
+# ─────────────────────────────────────────────────────────────
+# Hexagonal: ドメイン/UseCase は infra 技術を知らない
+# ─────────────────────────────────────────────────────────────
+[importlinter:contract:domain-no-infra]
+name = 検索ドメイン(SearchEngine)は DB/Web/Vector/Gemini 技術に依存しない
+type = forbidden
+source_modules =
+    app.modules.search.search_engine
+forbidden_modules =
+    fastapi
+    sqlalchemy
+    chromadb
+    google
+    app.database
+    app.modules.history.orm_prompt_history
+    app.modules.history.orm_professor_search_result
+    app.modules.history.repository
+    app.modules.document.vector_store
+    app.modules.ai.adapters
+
+[importlinter:contract:usecase-no-infra]
+name = 履歴UseCase(PromptHistoryService)は DB 技術に依存しない
+type = forbidden
+source_modules =
+    app.modules.history.prompt_history_service
+forbidden_modules =
+    sqlalchemy
+    app.database
+    app.modules.history.orm_prompt_history
+    app.modules.history.orm_professor_search_result
+    app.modules.history.repository
+
+# ─────────────────────────────────────────────────────────────
+# Modular Monolith: Module 間の依存方向を一方向に固定（逆流・循環を禁止）
+#   上位 → 下位 のみ許可: history → search → document → ai
+# ─────────────────────────────────────────────────────────────
+[importlinter:contract:module-layers]
+name = Module 依存は一方向（history > search > document > ai、逆流禁止）
+type = layers
+containers =
+    app.modules
+layers =
+    history
+    search
+    document
+    ai
+# ルート(inbound Adapter)が Composition Root を参照する経路は Module 間依存では
+# ないため除外する（container は層の外＝合成点）。
+ignore_imports =
+    app.modules.search.routes_search -> app.container
+    app.modules.search.routes_search_jobs -> app.container
+    app.modules.history.routes_prompt_history -> app.container
+
+# 横断 shared は Module を知らない（下位に位置する）
+[importlinter:contract:shared-no-modules]
+name = shared は各 Module に依存しない
+type = forbidden
+source_modules =
+    app.shared
+forbidden_modules =
+    app.modules

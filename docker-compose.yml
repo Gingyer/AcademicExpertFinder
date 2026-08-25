@@ -1,0 +1,11 @@
+services:
+  dev:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"            # ← 追加
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

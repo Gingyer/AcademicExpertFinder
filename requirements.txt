@@ -1,0 +1,13 @@
+pytest
+python-dotenv
+fastapi
+pydantic
+uvicorn[standard]
+google-generativeai
+chromadb
+requests
+pdfminer.six
+sqlalchemy
+psycopg2-binary
+alembic
+pgvector

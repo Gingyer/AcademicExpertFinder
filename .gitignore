@@ -1,0 +1,139 @@
+# ==========================================================================
+# Git/GitHub管理ポリシー
+#   GitHubには「制作しているプロジェクト本体」だけを入れる。
+#   ビルダー（AI開発支援の仕組み）一式は追跡しない（手元にだけ置く）。
+#   Markdown は README.md と skills 以外を追跡しない。
+#   commit / push は人間が手動で行う。
+# ==========================================================================
+
+# --- README.md 以外の Markdown は追跡しない ---
+*.md
+!README.md
+
+# --- skills は追跡しない（リポジトリから切り離す） ---
+skills/
+
+# --- ビルダーのディレクトリ（プロジェクト本体ではないので追跡しない） ---
+milestones/
+prompts/
+scripts/
+dev/
+conftest.py
+
+# --- ビルダーの制御・ログ系（拡張子に関わらず一応明示） ---
+AI_LOG.md
+APPROVAL.md
+TASKS.md
+DECISIONS.md
+PROJECT_GOAL.md
+CLAUDE.md
+AGENTS.md
+USAGE.md
+API_SPEC.md
+SECURITY.md
+
+# --- 教授データ（追跡しない。ローカルにのみ置く） ---
+app/data/
+
+# --- ローカル開発・テスト用データベースファイル（dev/ に置くこと） ---
+# テスト用SQLiteはリポジトリに含めず dev/ 配下に置く（dev/ 自体は上のセクションで除外済み）
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================================================================
+# 秘密情報（絶対にコミットしない）
+# ==========================================================================
+.env
+.env.*
+# .env.example は実キーが入っていたため履歴から削除済み。今後も追跡しない（例外にしない）。
+.env.example
+*.key
+*.pem
+secrets/
+
+# --- 鍵・証明書・キーストア ---
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.keystore
+*.jks
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.ppk
+
+# --- クラウド/サービスアカウント認証情報（GCP/Gemini・AWS 等） ---
+credentials.json
+client_secret*.json
+service-account*.json
+*service-account*.json
+gcp-*.json
+google-credentials*.json
+*-credentials.json
+.aws/
+.gcp/
+gha-creds-*.json
+
+# --- 認証ファイル・パスワード ---
+.netrc
+_netrc
+.pgpass
+.htpasswd
+auth.json
+
+# --- PGP/GPG 秘密鍵 ---
+*.gpg
+*.asc
+secring.*
+
+# --- ログ・DBダンプ・バックアップ（機密や個人情報が混入しやすい） ---
+*.log
+*.sql.gz
+*.dump
+*.bak
+*.orig
+
+# ==========================================================================
+# IDE・ツール固有（ローカル環境設定）
+# ==========================================================================
+.claude/
+.idea/
+.vscode/
+
+# ==========================================================================
+# Node.js / フロントエンド
+# ==========================================================================
+node_modules/
+dist/
+*.tsbuildinfo
+./frontend-test-output/*
+frontend-test-output/*
+# ==========================================================================
+# Python / 環境 / OS
+# ==========================================================================
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+.DS_Store
+tests/
+animation-editor/
+legacy/
+
+# --- Cookie / スクレイピング用の認証ファイル（機密。追跡しない） ---
+cj.txt
+*cookie*.txt
+cookies.txt
+
+# --- レビュー補助スクリプト / バックアップ（追跡しない） ---
+review_with_codex.sh
+# project-backup-20260820/ は project/（gitルート）の外側にあるため元々追跡対象外。
+# 念のため記載（万一リポジトリ内に置かれた場合の保険）。
+project-backup-20260820/
