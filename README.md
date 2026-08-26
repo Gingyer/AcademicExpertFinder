@@ -190,65 +190,65 @@ npm run dev
 
 ## アーキテクチャ
 
-```Mermaid
-  flowchart TD
-      A["ユーザー入力<br/>自然文プロンプト"]
+```mermaid
+flowchart TD
+    A["ユーザー入力<br/>自然文プロンプト"]
 
-      B["フロントエンド<br/>Next.js<br/>lib/api・searchClient"]
+    B["フロントエンド<br/>Next.js<br/>lib/api・searchClient"]
 
-      C["検索開始<br/>HTTPS / JSON"]
+    C["検索開始<br/>HTTPS / JSON"]
 
-      D["バックエンド<br/>FastAPI<br/>modules/search/routes_*"]
+    D["バックエンド<br/>FastAPI<br/>modules/search/routes_*"]
 
-      E["job_id を即時返却"]
+    E["job_id を即時返却"]
 
-      F["検索ユースケース<br/>SearchEngine"]
+    F["検索ユースケース<br/>SearchEngine"]
 
-      G["① 意図判定"]
-      H["② ベクトル検索"]
-      I{"③ 信頼度が<br/>閾値以上か？"}
-      J["④ クエリ拡張"]
-      K["⑤ LLM 再ランキング<br/>＋理由生成"]
+    G["① 意図判定"]
+    H["② ベクトル検索"]
+    I{"③ 信頼度が<br/>閾値以上か？"}
+    J["④ クエリ拡張"]
+    K["⑤ LLM 再ランキング<br/>＋理由生成"]
 
-      V[("ベクトル索引<br/>ChromaDB")]
-      AI["AI<br/>Gemini<br/>埋め込み / 生成"]
-      DB[("履歴永続化<br/>PostgreSQL")]
+    V[("ベクトル索引<br/>ChromaDB")]
+    AI["AI<br/>Gemini<br/>埋め込み / 生成"]
+    DB[("履歴永続化<br/>PostgreSQL")]
 
-      L["SSE で進捗を送信"]
-      M["SSE done<br/>理由つき教授候補を返却"]
+    L["SSE で進捗を送信"]
+    M["SSE done<br/>理由つき教授候補を返却"]
 
-      N["フロントエンド<br/>検索結果を描画"]
+    N["フロントエンド<br/>検索結果を描画"]
 
-      A --> B
-      B -->|"HTTPS / JSON"| C
-      C --> D
+    A --> B
+    B -->|HTTPS / JSON| C
+    C --> D
 
-      D --> E
-      E -->|"job_id"| B
+    D --> E
+    E -->|job_id| B
 
-      D --> F
-      F --> G
-      G --> H
+    D --> F
+    F --> G
+    G --> H
 
-      H --> V
-      H --> AI
+    H --> V
+    H --> AI
 
-      H --> I
+    H --> I
 
-      I -->|"Yes"| K
-      I -->|"No"| J
-      J --> AI
-      AI --> K
+    I -->|Yes| K
+    I -->|No| J
+    J --> AI
+    AI --> K
 
-      K --> DB
+    K --> DB
 
-      F -.->|"処理中"| L
-      L -.->|"SSE"| B
+    F -.->|処理中| L
+    L -.->|SSE| B
 
-      K --> M
-      M -->|"SSE done"| B
+    K --> M
+    M -->|SSE done| B
 
-      B --> N
+    B --> N
 ```
 
 - 機能単位の **Modular Monolith**（`app/modules/{search, history, ai, document}`）＋横断契約（`app/shared`）＋合成点（`app/container.py`）で構成。
